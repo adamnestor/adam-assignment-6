@@ -10,6 +10,8 @@ public class SalesReportApplication {
 		
 		List<List<String>> fileContents1 = FileService.readTeslaData(filePath1);
 		
+		
+		// Extra to check if it's working
 		for (List<String> contents : fileContents1) {
 			System.out.println(contents);
 		}
