@@ -30,7 +30,7 @@ public class FileService {
 		Map<LocalDate, Integer> monthlySales = new HashMap<>();
 		
 		try (BufferedReader reader = new BufferedReader(new FileReader(fileName))){
-			reader.lines()
+			reader.lines() 
 				  .skip(1)
 				  .map(line -> line.split(","))
 				  .forEach(fields -> {
