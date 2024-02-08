@@ -1,42 +1,39 @@
 package com.coderscampus;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 public class FileService {
 
-	public static List<List<String>> readTeslaData(String filePath) {
-
-		List<List<String>> fileContents = new ArrayList<>();
-
-		Path dataFilePath = Paths.get(filePath);
-
-		if (Files.exists(dataFilePath)) {
-			try {
-				List<String> lines = Files.readAllLines(dataFilePath);
-
-				for (String line : lines) {
-					String[] values = line.split(",");
-					List<String> lineValues = new ArrayList<>();
-
-					for (String value : values) {
-						lineValues.add(value);
-					}
-
-					fileContents.add(lineValues);
-
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-		} else {
-			System.out.println("CSV file at '" + filePath + "' does not exist.");
+	public static Map<LocalDate, Integer> readCSVFile(String fileName) {
+		Map<LocalDate, Integer> monthlySales = new HashMap<>();
+		DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+				.parseCaseInsensitive()
+				.appendPattern("MMM-yy")
+				.toFormatter(Locale.ENGLISH);
+		
+		try (BufferedReader reader = new BufferedReader(new FileReader(fileName))){
+			reader.lines()
+				  .skip(1)
+				  .map(line -> line.split(","))
+				  .forEach(fields -> {
+					  String dateString = fields[0];
+					  System.out.println("Date String: " + dateString);
+					  LocalDate date = LocalDate.parse(fields[0], formatter);
+					  int sales = Integer.parseInt(fields[1]);
+					  
+					  monthlySales.merge(date, sales, Integer::sum);
+				  });
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		return fileContents;
+		return monthlySales;
 	}
 }

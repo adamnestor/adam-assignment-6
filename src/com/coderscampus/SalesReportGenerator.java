@@ -1,8 +1,39 @@
 package com.coderscampus;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 public class SalesReportGenerator {
-	
-	// I want to read the files and do the stuff currently happening in main
-	// I want main to have 3-6 lines max
+
+	public void generateReport(String fileName, String modelName) {
+
+		System.out.println(modelName + " Yearly Sales Report");
+		System.out.println("--------------------------------");
+
+		Map<Integer, Integer> yearlySales = new HashMap<>();
+		Map<LocalDate, Integer> monthlySales = FileService.readCSVFile(fileName);
+
+		yearlySales.putAll(monthlySales.entrySet().stream().collect(
+				Collectors.groupingBy(entry -> entry.getKey().getYear(), Collectors.summingInt(Map.Entry::getValue))));
+
+		yearlySales.entrySet().forEach(entry -> System.out.println(entry.getKey() + " -> " + entry.getValue()));
+
+		String bestMonth = monthlySales.entrySet().stream().max(Map.Entry.comparingByValue())
+				.flatMap(entry -> Optional.ofNullable(entry.getKey().format(DateTimeFormatter.ofPattern("yyyy-MM"))))
+				.orElse("N/A");
+
+		String worstMonth = monthlySales.entrySet().stream().min(Map.Entry.comparingByValue())
+				.flatMap(entry -> Optional.ofNullable(entry.getKey().format(DateTimeFormatter.ofPattern("yyyy-MM"))))
+				.orElse("N/A");
+
+		System.out.println("The best month for " + modelName + " was: " + bestMonth);
+		System.out.println("The worst month for " + modelName + " was: " + worstMonth);
+		System.out.println();
+
+	}
 
 }
